@@ -114,6 +114,7 @@ export class GoToPosition extends AutopilotMode {
     calculateForces(_dt: number, out: number[] = Array(24).fill(0)): number[] {
         const pos = this.spacecraft.getWorldPositionRef();
         const vel = this.spacecraft.getWorldVelocityRef();
+        const refVel = this.referenceVelocityWorld || this.tmpVecB.set(0, 0, 0);
         const q = this.spacecraft.getWorldOrientationRef();
         const qInv = this.tmpQuatA.copy(q).invert();
 
