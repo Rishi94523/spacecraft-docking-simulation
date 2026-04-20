@@ -659,8 +659,17 @@ export class Spacecraft {
      * Undock from a specific port
      */
     public undock(portId: string): boolean {
+        return this.undockWithResult(portId) !== null;
+    }
+
+    public undockWithResult(portId: string): {
+        detached: Spacecraft;
+        anchor: Spacecraft;
+        detachedPortId: string;
+        anchorPortId: string;
+    } | null {
         const port = this.dockingPorts[portId];
-        if (!port || !port.isOccupied || !port.dockedTo) return false;
+        if (!port || !port.isOccupied || !port.dockedTo) return null;
 
         const otherSpacecraft = port.dockedTo.spacecraft;
         const otherPort = port.dockedTo.port;
@@ -761,7 +770,7 @@ export class Spacecraft {
             otherSpacecraft.spacecraftController?.refreshThrusterGroups?.();
         } catch {}
 
-        return true;
+        return null;
     }
 
     /**
