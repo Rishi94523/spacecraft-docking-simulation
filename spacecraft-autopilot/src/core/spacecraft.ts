@@ -798,6 +798,19 @@ export class Spacecraft {
         };
     }
 
+    private computeUndockClearancePose(
+        anchorCraft: Spacecraft,
+        anchorPortId: string,
+        detachedCraft: Spacecraft,
+        detachedPortId: string,
+    ): { position: THREE.Vector3; direction: THREE.Vector3 } | null {
+        void anchorCraft;
+        void anchorPortId;
+        void detachedCraft;
+        void detachedPortId;
+        return null;
+    }
+
     /**
      * Toggle visibility of helper arrows
      */
