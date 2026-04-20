@@ -121,7 +121,8 @@ export class GoToPosition extends AutopilotMode {
         // ── Vector to target ──────────────────────────────────────────
         const toTarget = this.tmpVecA.copy(this.targetPosition).sub(pos);
         const distance = toTarget.length();
-        const speed = vel.length();
+        const relVel = this.tmpVecC.copy(vel).sub(refVel);
+        const speed = relVel.length();
 
         const stopDist = Math.max(0.001, this.tuning.stopDistance);
         const deadband = Math.max(1e-4, this.tuning.velocityDeadbandActual);
