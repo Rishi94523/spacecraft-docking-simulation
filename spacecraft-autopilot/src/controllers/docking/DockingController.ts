@@ -859,5 +859,24 @@ export class DockingController {
         const anchorPortPosition = result.anchor.getDockingPortWorldPosition(result.anchorPortId);
         const anchorPortDirection = result.anchor.getDockingPortWorldDirection(result.anchorPortId);
         if (!autopilot || !anchorPortPosition || !anchorPortDirection) return;
+
+        const direction = anchorPortDirection.clone().normalize();
+        const anchorFace = anchorPortPosition.clone().addScaledVector(
+            direction,
+            (result.anchor.objects.dockingPortLength || 0.1) * 0.5,
+        );
+        const detachedRadius = Math.max(
+            result.detached.getFullDimensions().x,
+            result.detached.getFullDimensions().y,
+            result.detached.getFullDimensions().z,
+        );
+        const anchorRadius = Math.max(
+            result.anchor.getFullDimensions().x,
+            result.anchor.getFullDimensions().y,
+            result.anchor.getFullDimensions().z,
+        );
+        const retreatDistance = detachedRadius + anchorRadius + 3.0;
+        const retreatTarget = anchorFace.clone().addScaledVector(direction, retreatDistance);
+        void retreatTarget;
     }
 }
