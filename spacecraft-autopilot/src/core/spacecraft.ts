@@ -816,11 +816,25 @@ export class Spacecraft {
         const anchorPortDirection = anchorCraft.getDockingPortWorldDirection(anchorPortId);
         if (!anchorPortCenter || !anchorPortDirection) return null;
 
-        void detachedCraft;
-        void detachedPortId;
+        const anchorFaceDistance = (anchorCraft.objects.dockingPortLength || 0.1) * 0.5;
+        const detachedFaceDistance =
+            detachedCraft.getPortOffset(detachedPortId)
+            + (detachedCraft.objects.dockingPortLength || 0.1) * 0.5;
+        const separationGap = Math.max(
+            0.75,
+            Math.max(
+                detachedCraft.objects.dockingPortRadius || 0.0,
+                anchorCraft.objects.dockingPortRadius || 0.0,
+            ) * 3.0,
+        );
+        const direction = anchorPortDirection.clone().normalize();
+        const anchorFace = anchorPortCenter.clone().addScaledVector(direction, anchorFaceDistance);
         return {
-            position: anchorPortCenter,
-            direction: anchorPortDirection.clone().normalize(),
+            position: anchorFace.clone().addScaledVector(
+                direction,
+                detachedFaceDistance + separationGap,
+            ),
+            direction,
         };
     }
 
