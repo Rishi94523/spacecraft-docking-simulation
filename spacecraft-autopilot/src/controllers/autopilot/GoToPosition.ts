@@ -114,7 +114,7 @@ export class GoToPosition extends AutopilotMode {
     calculateForces(_dt: number, out: number[] = Array(24).fill(0)): number[] {
         const pos = this.spacecraft.getWorldPositionRef();
         const vel = this.spacecraft.getWorldVelocityRef();
-        const refVel = this.referenceVelocityWorld || this.tmpVecB.set(0, 0, 0);
+        const refVel = this.referenceVelocityWorld || this.tmpVecD.set(0, 0, 0);
         const q = this.spacecraft.getWorldOrientationRef();
         const qInv = this.tmpQuatA.copy(q).invert();
 
@@ -202,10 +202,10 @@ export class GoToPosition extends AutopilotMode {
             : this.tmpVecB.set(0, 0, 0);
 
         // Desired velocity: speed along direction to target
-        const vDesWorld = this.tmpVecC.copy(toTargetDir).multiplyScalar(vDesired);
+        const vDesWorld = this.tmpVecD.copy(toTargetDir).multiplyScalar(vDesired);
 
         // ── Velocity error ────────────────────────────────────────────
-        const vErr = this.tmpVecD.copy(vDesWorld).sub(relVel);
+        const vErr = this.tmpVecE.copy(vDesWorld).sub(relVel);
         const vErrMag = vErr.length();
 
         // ── Coast zone: if velocity error is small, don't fire ────────
@@ -225,7 +225,7 @@ export class GoToPosition extends AutopilotMode {
         this.burnFrames++;
 
         // Convert velocity error to local frame
-        const vErrLocal = this.tmpVecE.copy(vErr).applyQuaternion(qInv);
+        const vErrLocal = this.tmpVecA.copy(vErr).applyQuaternion(qInv);
 
         // Scale: force = mass * (vErr / responseTime)
         // Response time derived from spacecraft dynamics: time to achieve 1 m/s

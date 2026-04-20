@@ -29,6 +29,9 @@ export class DockingController {
     private isCleanedUp: boolean = false;
     /** Whether the approach has reached the pre-approach point (far along port axis). */
     private _approachAligned: boolean = false;
+    private retreatActive = false;
+    private retreatGoal: THREE.Vector3 | null = null;
+    private retreatCompletionRadius = 0.75;
 
     // Thresholds moved to shared DockingUtils for reuse across systems
 
@@ -60,6 +63,7 @@ export class DockingController {
     }
 
     public startDocking(targetSpacecraft: Spacecraft, ourPortId: DockingPortId, targetPortId: DockingPortId): void {
+        this.stopPostUndockRetreat();
         if (this.isDocking()) {
             this.cancelDocking();
         }
@@ -260,8 +264,12 @@ export class DockingController {
     }
 
     public update(): void {
+        if (!this.isDocking()) {
+            this.updatePostUndockRetreat();
+            return;
+        }
         // Only proceed if we have an active target and port selection
-        if (!this.isDocking() || !this.targetSpacecraft || !this._ourPortId || !this._targetPortId) return;
+        if (!this.targetSpacecraft || !this._ourPortId || !this._targetPortId) return;
 
         const autopilot = this.spacecraft.spacecraftController?.autopilot;
         // Always operate relative to the target spacecraft during docking
@@ -855,35 +863,85 @@ export class DockingController {
         detachedPortId: string;
         anchorPortId: string;
     }): void {
-        const autopilot = result.detached.spacecraftController?.autopilot;
-        const anchorPortPosition = result.anchor.getDockingPortWorldPosition(result.anchorPortId);
-        const anchorPortDirection = result.anchor.getDockingPortWorldDirection(result.anchorPortId);
+        result.detached.dockingController?.beginPostUndockRetreat(
+            result.anchor,
+            result.anchorPortId,
+            result.detached,
+        );
+    }
+
+    private beginPostUndockRetreat(anchor: Spacecraft, anchorPortId: string, detached: Spacecraft): void {
+        const autopilot = detached.spacecraftController?.autopilot;
+        const anchorPortPosition = anchor.getDockingPortWorldPosition(anchorPortId);
+        const anchorPortDirection = anchor.getDockingPortWorldDirection(anchorPortId);
         if (!autopilot || !anchorPortPosition || !anchorPortDirection) return;
 
         const direction = anchorPortDirection.clone().normalize();
         const anchorFace = anchorPortPosition.clone().addScaledVector(
             direction,
-            (result.anchor.objects.dockingPortLength || 0.1) * 0.5,
+            (anchor.objects.dockingPortLength || 0.1) * 0.5,
         );
         const detachedRadius = Math.max(
-            result.detached.getFullDimensions().x,
-            result.detached.getFullDimensions().y,
-            result.detached.getFullDimensions().z,
+            detached.getFullDimensions().x,
+            detached.getFullDimensions().y,
+            detached.getFullDimensions().z,
         );
         const anchorRadius = Math.max(
-            result.anchor.getFullDimensions().x,
-            result.anchor.getFullDimensions().y,
-            result.anchor.getFullDimensions().z,
+            anchor.getFullDimensions().x,
+            anchor.getFullDimensions().y,
+            anchor.getFullDimensions().z,
         );
         const retreatDistance = detachedRadius + anchorRadius + 3.0;
-        const retreatTarget = anchorFace.clone().addScaledVector(direction, retreatDistance);
+
+        this.retreatGoal = anchorFace.clone().addScaledVector(direction, retreatDistance);
+        this.retreatActive = true;
 
         autopilot.resetAllModes();
-        autopilot.setReferenceObject(result.anchor);
+        autopilot.setReferenceObject(null);
         autopilot.setObstacleExclusions([]);
-        autopilot.setGoToSpeedLimit(1.0);
-        autopilot.setTargetPosition(retreatTarget);
+        autopilot.setGoToSpeedLimit(0.8);
+        autopilot.setTargetPosition(this.retreatGoal);
         autopilot.setMode('cancelRotation', true);
         autopilot.setMode('goToPosition', true);
+    }
+
+    private updatePostUndockRetreat(): void {
+        if (!this.retreatActive || !this.retreatGoal) return;
+
+        const autopilot = this.spacecraft.spacecraftController?.autopilot;
+        if (!autopilot) {
+            this.stopPostUndockRetreat();
+            return;
+        }
+
+        const distance = this.spacecraft.getWorldPosition().distanceTo(this.retreatGoal);
+        if (distance <= this.retreatCompletionRadius && this.isStable(0.12, 0.08)) {
+            this.stopPostUndockRetreat();
+            return;
+        }
+
+        autopilot.setReferenceObject(null);
+        autopilot.setObstacleExclusions([]);
+        autopilot.setGoToSpeedLimit(0.8);
+        autopilot.setTargetPosition(this.retreatGoal);
+        if (!autopilot.getActiveAutopilots().cancelRotation) {
+            autopilot.setMode('cancelRotation', true);
+        }
+        if (!autopilot.getActiveAutopilots().goToPosition) {
+            autopilot.setMode('goToPosition', true);
+        }
+    }
+
+    private stopPostUndockRetreat(): void {
+        const autopilot = this.spacecraft.spacecraftController?.autopilot;
+        this.retreatActive = false;
+        this.retreatGoal = null;
+        if (!autopilot) return;
+
+        autopilot.setGoToSpeedLimit(null);
+        autopilot.setObstacleExclusions([]);
+        autopilot.setReferenceObject(null);
+        autopilot.resetAllModes();
+        this.spacecraft.spacecraftController?.resetThrusterLatch?.();
     }
 }
