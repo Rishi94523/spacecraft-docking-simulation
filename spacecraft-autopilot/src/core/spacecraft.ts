@@ -686,9 +686,12 @@ export class Spacecraft {
 
         // Decompose compound body or remove joint constraint
         if (this.physics) {
-            const guestRigid = otherSpacecraft.objects.rigid;
-            const isCompound = guestRigid?.isRedirected?.();
-            if (isCompound && guestRigid) {
+            const thisRigid = this.objects.rigid;
+            const otherRigid = otherSpacecraft.objects.rigid;
+            const thisIsGuest = !!thisRigid?.isRedirected?.();
+            const otherIsGuest = !!otherRigid?.isRedirected?.();
+            const detachedRigid = thisIsGuest ? thisRigid : otherIsGuest ? otherRigid : null;
+            if (detachedRigid?.isRedirected?.()) {
                 // --- Compound body decomposition ---
                 // Snapshot guest's current world pose from the redirect proxy BEFORE unredirecting
                 const guestWorldPos = otherSpacecraft.getWorldPosition();
