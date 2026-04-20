@@ -877,6 +877,13 @@ export class DockingController {
         );
         const retreatDistance = detachedRadius + anchorRadius + 3.0;
         const retreatTarget = anchorFace.clone().addScaledVector(direction, retreatDistance);
-        void retreatTarget;
+
+        autopilot.resetAllModes();
+        autopilot.setReferenceObject(result.anchor);
+        autopilot.setObstacleExclusions([]);
+        autopilot.setGoToSpeedLimit(1.0);
+        autopilot.setTargetPosition(retreatTarget);
+        autopilot.setMode('cancelRotation', true);
+        autopilot.setMode('goToPosition', true);
     }
 }
