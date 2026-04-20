@@ -759,19 +759,18 @@ export class Spacecraft {
                 detachedRigid.setAngularVelocity(detachedWorldAngVel);
 
                 // Restore root mass
-                const guestMass = otherSpacecraft.getMass?.() || 0;
-                rootCraft.objects.boxBody.mass = Math.max(1, rootCraft.objects.boxBody.mass - guestMass);
+                const detachedMass = detachedCraft.getMass?.() || 0;
+                rootCraft.objects.boxBody.mass = Math.max(1, rootCraft.objects.boxBody.mass - detachedMass);
 
                 // Small separation impulse along the undocking axis
-                const sepDir = otherSpacecraft.getDockingPortWorldDirection(otherPort);
-                if (sepDir) {
-                    const sepForce = 0.3;
-                    guestRigid.setLinearVelocity({
-                        x: guestWorldVel.x + sepDir.x * sepForce,
-                        y: guestWorldVel.y + sepDir.y * sepForce,
-                        z: guestWorldVel.z + sepDir.z * sepForce,
-                    });
-                }
+                const sepSpeed = 0.9;
+                const anchorVelocity = anchorCraft.getWorldVelocity();
+                detachedRigid.setLinearVelocity({
+                    x: anchorVelocity.x + separationDirection.x * sepSpeed,
+                    y: anchorVelocity.y + separationDirection.y * sepSpeed,
+                    z: anchorVelocity.z + separationDirection.z * sepSpeed,
+                });
+                detachedRigid.setAngularVelocity({ x: 0, y: 0, z: 0 });
             } else if (this.dockingHandle) {
                 // --- Fallback: remove joint ---
                 this.physics.removeConstraint(this.dockingHandle);
