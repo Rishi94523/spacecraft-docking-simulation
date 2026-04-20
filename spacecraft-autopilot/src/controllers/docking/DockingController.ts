@@ -639,7 +639,7 @@ export class DockingController {
         if (this.phase === 'docked' && this._ourPortId) {
             const result = this.spacecraft.undockWithResult?.(this._ourPortId) ?? null;
             this.cancelDocking();
-            void result;
+            if (result) this.commandPostUndockRetreat(result);
             return;
         }
 
@@ -648,7 +648,7 @@ export class DockingController {
         if (occupied) {
             const result = this.spacecraft.undockWithResult?.(occupied) ?? null;
             this.cancelDocking();
-            void result;
+            if (result) this.commandPostUndockRetreat(result);
         }
     }
 
@@ -847,5 +847,14 @@ export class DockingController {
             modes,
             ports: { our: this._ourPortId, target: this._targetPortId }
         };
+    }
+
+    private commandPostUndockRetreat(result: {
+        detached: Spacecraft;
+        anchor: Spacecraft;
+        detachedPortId: string;
+        anchorPortId: string;
+    }): void {
+        void result;
     }
 }
