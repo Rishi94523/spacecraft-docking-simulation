@@ -637,8 +637,9 @@ export class DockingController {
 
     public undock(): void {
         if (this.phase === 'docked' && this._ourPortId) {
-            this.spacecraft.undock(this._ourPortId);
+            const result = this.spacecraft.undockWithResult?.(this._ourPortId) ?? null;
             this.cancelDocking();
+            void result;
             return;
         }
 
