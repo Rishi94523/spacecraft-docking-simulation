@@ -215,7 +215,7 @@ export class GoToPosition extends AutopilotMode {
 
         if (coasting) {
             // ── COAST: zero thrust ────────────────────────────────────
-            this.buildTelemetry(distance, vel, vDesired, toTargetDir, caps, 'coast');
+            this.buildTelemetry(distance, relVel, vDesired, toTargetDir, caps, 'coast');
             return out;
         }
 
@@ -241,9 +241,9 @@ export class GoToPosition extends AutopilotMode {
         this.applyAxisForce(localForce.y, localForce.y >= 0 ? 0 : 1, this.thrusterGroups.up, out);
         this.applyAxisForce(localForce.x, localForce.x >= 0 ? 1 : 0, this.thrusterGroups.left, out);
 
-        const vAlong = vel.dot(toTargetDir);
+        const vAlong = relVel.dot(toTargetDir);
         const phase = vAlong > vDesired * 1.05 ? 'burn_decel' : 'burn_accel';
-        this.buildTelemetry(distance, vel, vDesired, toTargetDir, caps, phase);
+        this.buildTelemetry(distance, relVel, vDesired, toTargetDir, caps, phase);
         return out;
     }
 
