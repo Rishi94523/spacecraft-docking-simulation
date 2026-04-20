@@ -743,8 +743,17 @@ export class Spacecraft {
                 // Unredirect guest — re-enables its native Rapier body
                 detachedRigid.unredirect?.();
 
+                const clearancePose = this.computeUndockClearancePose(
+                    anchorCraft,
+                    anchorPortId,
+                    detachedCraft,
+                    detachedPortId,
+                );
+                const releasedPosition = clearancePose?.position ?? detachedWorldPos;
+                const separationDirection = clearancePose?.direction ?? new THREE.Vector3(0, 0, 1);
+
                 // Set guest's native body to the correct world pose
-                detachedRigid.setPosition(detachedWorldPos.x, detachedWorldPos.y, detachedWorldPos.z);
+                detachedRigid.setPosition(releasedPosition.x, releasedPosition.y, releasedPosition.z);
                 detachedRigid.setQuaternion(detachedWorldQuat.x, detachedWorldQuat.y, detachedWorldQuat.z, detachedWorldQuat.w);
                 detachedRigid.setLinearVelocity(detachedWorldVel);
                 detachedRigid.setAngularVelocity(detachedWorldAngVel);
