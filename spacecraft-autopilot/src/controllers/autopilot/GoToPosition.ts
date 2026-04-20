@@ -203,7 +203,7 @@ export class GoToPosition extends AutopilotMode {
         const vDesWorld = this.tmpVecC.copy(toTargetDir).multiplyScalar(vDesired);
 
         // ── Velocity error ────────────────────────────────────────────
-        const vErr = this.tmpVecD.copy(vDesWorld).sub(vel);
+        const vErr = this.tmpVecD.copy(vDesWorld).sub(relVel);
         const vErrMag = vErr.length();
 
         // ── Coast zone: if velocity error is small, don't fire ────────
