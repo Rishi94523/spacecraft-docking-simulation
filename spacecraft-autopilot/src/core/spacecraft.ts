@@ -691,6 +691,19 @@ export class Spacecraft {
             const thisIsGuest = !!thisRigid?.isRedirected?.();
             const otherIsGuest = !!otherRigid?.isRedirected?.();
             const detachedRigid = thisIsGuest ? thisRigid : otherIsGuest ? otherRigid : null;
+
+            if (thisIsGuest) {
+                detachedCraft = this;
+                anchorCraft = otherSpacecraft;
+                detachedPortId = portId;
+                anchorPortId = otherPort;
+            } else if (otherIsGuest) {
+                detachedCraft = otherSpacecraft;
+                anchorCraft = this;
+                detachedPortId = otherPort;
+                anchorPortId = portId;
+            }
+
             if (detachedRigid?.isRedirected?.()) {
                 // --- Compound body decomposition ---
                 // Snapshot guest's current world pose from the redirect proxy BEFORE unredirecting
