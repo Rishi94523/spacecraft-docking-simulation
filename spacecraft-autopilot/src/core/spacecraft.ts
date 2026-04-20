@@ -812,11 +812,16 @@ export class Spacecraft {
         detachedCraft: Spacecraft,
         detachedPortId: string,
     ): { position: THREE.Vector3; direction: THREE.Vector3 } | null {
-        void anchorCraft;
-        void anchorPortId;
+        const anchorPortCenter = anchorCraft.getDockingPortWorldPosition(anchorPortId);
+        const anchorPortDirection = anchorCraft.getDockingPortWorldDirection(anchorPortId);
+        if (!anchorPortCenter || !anchorPortDirection) return null;
+
         void detachedCraft;
         void detachedPortId;
-        return null;
+        return {
+            position: anchorPortCenter,
+            direction: anchorPortDirection.clone().normalize(),
+        };
     }
 
     /**
