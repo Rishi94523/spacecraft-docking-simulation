@@ -732,12 +732,12 @@ export class Spacecraft {
                 }
 
                 // Remove guest's collider from root body (check both root and this for handles)
-                const colliderHandle = rootCraft.compoundColliderHandles.get(otherSpacecraft.uuid)
-                    ?? this.compoundColliderHandles.get(otherSpacecraft.uuid);
+                const colliderHandle = rootCraft.compoundColliderHandles.get(detachedCraft.uuid)
+                    ?? this.compoundColliderHandles.get(detachedCraft.uuid);
                 if (colliderHandle != null) {
                     this.physics.removeCollider?.(colliderHandle);
-                    rootCraft.compoundColliderHandles.delete(otherSpacecraft.uuid);
-                    this.compoundColliderHandles.delete(otherSpacecraft.uuid);
+                    rootCraft.compoundColliderHandles.delete(detachedCraft.uuid);
+                    this.compoundColliderHandles.delete(detachedCraft.uuid);
                 }
 
                 // Unredirect guest — re-enables its native Rapier body
