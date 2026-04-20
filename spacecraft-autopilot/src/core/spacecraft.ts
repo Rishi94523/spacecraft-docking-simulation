@@ -707,10 +707,10 @@ export class Spacecraft {
             if (detachedRigid?.isRedirected?.()) {
                 // --- Compound body decomposition ---
                 // Snapshot guest's current world pose from the redirect proxy BEFORE unredirecting
-                const guestWorldPos = otherSpacecraft.getWorldPosition();
-                const guestWorldQuat = otherSpacecraft.getWorldOrientation();
-                const guestWorldVel = otherSpacecraft.getWorldVelocity();
-                const guestWorldAngVel = otherSpacecraft.getWorldAngularVelocity();
+                const detachedWorldPos = detachedCraft.getWorldPosition();
+                const detachedWorldQuat = detachedCraft.getWorldOrientation();
+                const detachedWorldVel = detachedCraft.getWorldVelocity();
+                const detachedWorldAngVel = detachedCraft.getWorldAngularVelocity();
 
                 // Find the compound root — collider handles are stored on the root spacecraft
                 let rootCraft: Spacecraft = this;
