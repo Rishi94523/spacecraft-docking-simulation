@@ -121,6 +121,8 @@ export class GoToPosition extends AutopilotMode {
         // ── Vector to target ──────────────────────────────────────────
         const toTarget = this.tmpVecA.copy(this.targetPosition).sub(pos);
         const distance = toTarget.length();
+        // When tracking a moving reference, braking must use relative motion
+        // or the craft will slow against world-frame drift and fall behind.
         const relVel = this.tmpVecC.copy(vel).sub(refVel);
         const speed = relVel.length();
 
