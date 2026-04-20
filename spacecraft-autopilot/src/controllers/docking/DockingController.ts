@@ -855,6 +855,9 @@ export class DockingController {
         detachedPortId: string;
         anchorPortId: string;
     }): void {
-        void result;
+        const autopilot = result.detached.spacecraftController?.autopilot;
+        const anchorPortPosition = result.anchor.getDockingPortWorldPosition(result.anchorPortId);
+        const anchorPortDirection = result.anchor.getDockingPortWorldDirection(result.anchorPortId);
+        if (!autopilot || !anchorPortPosition || !anchorPortDirection) return;
     }
 }
