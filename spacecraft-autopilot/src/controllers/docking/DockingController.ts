@@ -646,8 +646,9 @@ export class DockingController {
         // Fallback: allow undocking even if phase wasn't set by DockingController
         const occupied = Object.keys(this.spacecraft.dockingPorts).find(pid => this.spacecraft.dockingPorts[pid]?.isOccupied);
         if (occupied) {
-            this.spacecraft.undock(occupied);
+            const result = this.spacecraft.undockWithResult?.(occupied) ?? null;
             this.cancelDocking();
+            void result;
         }
     }
 
