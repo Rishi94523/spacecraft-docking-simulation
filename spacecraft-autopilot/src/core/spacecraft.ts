@@ -673,6 +673,10 @@ export class Spacecraft {
 
         const otherSpacecraft = port.dockedTo.spacecraft;
         const otherPort = port.dockedTo.port;
+        let detachedCraft: Spacecraft = this;
+        let anchorCraft: Spacecraft = otherSpacecraft;
+        let detachedPortId = portId;
+        let anchorPortId = otherPort;
 
         // Clear docking information
         port.isOccupied = false;
@@ -770,7 +774,12 @@ export class Spacecraft {
             otherSpacecraft.spacecraftController?.refreshThrusterGroups?.();
         } catch {}
 
-        return null;
+        return {
+            detached: detachedCraft,
+            anchor: anchorCraft,
+            detachedPortId,
+            anchorPortId,
+        };
     }
 
     /**
