@@ -741,13 +741,13 @@ export class Spacecraft {
                 }
 
                 // Unredirect guest — re-enables its native Rapier body
-                guestRigid.unredirect?.();
+                detachedRigid.unredirect?.();
 
                 // Set guest's native body to the correct world pose
-                guestRigid.setPosition(guestWorldPos.x, guestWorldPos.y, guestWorldPos.z);
-                guestRigid.setQuaternion(guestWorldQuat.x, guestWorldQuat.y, guestWorldQuat.z, guestWorldQuat.w);
-                guestRigid.setLinearVelocity(guestWorldVel);
-                guestRigid.setAngularVelocity(guestWorldAngVel);
+                detachedRigid.setPosition(detachedWorldPos.x, detachedWorldPos.y, detachedWorldPos.z);
+                detachedRigid.setQuaternion(detachedWorldQuat.x, detachedWorldQuat.y, detachedWorldQuat.z, detachedWorldQuat.w);
+                detachedRigid.setLinearVelocity(detachedWorldVel);
+                detachedRigid.setAngularVelocity(detachedWorldAngVel);
 
                 // Restore root mass
                 const guestMass = otherSpacecraft.getMass?.() || 0;
