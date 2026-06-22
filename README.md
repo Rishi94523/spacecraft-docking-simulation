@@ -6,7 +6,7 @@ A Python microgravity simulator for a robotics subject project. The project mode
 
 - 3D rigid-body motion in a microgravity docking zone
 - Moving and rotating target station with relative-motion docking
-- Noisy relative-position/orientation sensing and IMU rates
+- Noisy relative-position/orientation sensing and IMU ratess
 - Lightweight filtered state estimation
 - Finite-state-machine autodocking logic
 - PD translational and attitude control
